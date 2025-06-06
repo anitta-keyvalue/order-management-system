@@ -1,4 +1,6 @@
 import express from "express";
+import loggerMiddleware from "./middlewares/loggerMiddleware";
+import authRouter from "./routes/auth.routes";
 // import employeeRouter from "./employee_router";
 // import employeeRouter from "./routes/employee.route";
 // import loggerMiddleware from "./middlewares/loggerMiddleware";
@@ -9,10 +11,10 @@ import express from "express";
 
 const server = express();
 server.use(express.json());
-// server.use(loggerMiddleware);
+server.use(loggerMiddleware);
 
 // server.use("/employee", authMiddleware, employeeRouter);
-// server.use("/auth", authRouter);
+server.use("/auth", authRouter);
 // server.use(errorMiddleware);
 
 // server.get("/", (req, res) => {
