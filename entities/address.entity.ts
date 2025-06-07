@@ -3,7 +3,7 @@ import AbstractEntity from "./abstract.entity";
 import User from "./user.entity";
 
 @Entity()
-class Address extends AbstractEntity {
+class  Address extends AbstractEntity {
   @Column()
   line1: string;
 

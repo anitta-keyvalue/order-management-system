@@ -8,12 +8,14 @@ class UserService {
   async createUser(
     email: string,
     name: string,
-    password: string
+    password: string,
+    phone: string   
   ): Promise<User> {
     const user = new User();
     user.email = email;
     user.name = name;
     user.password = await bcrypt.hash(password, 10);
+    user.phone = phone;
     return this.userRepository.create(user);
   }
 
