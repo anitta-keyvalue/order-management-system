@@ -5,6 +5,7 @@ import errorMiddleware from "./middlewares/errorMiddleware";
 import { dataSource } from "./db/data-source";
 import userRouter from "./routes/user.routes";
 import addressRouter from "./routes/address.route";
+import productRouter from "./routes/product.route";
 
 const server = express();
 server.use(express.json());
@@ -13,6 +14,7 @@ server.use(loggerMiddleware);
 server.use("/auth", authRouter);
 server.use("/user", userRouter);
 server.use("/address", addressRouter);
+server.use("/product", productRouter);
 server.use(errorMiddleware);
 
 (async () => {
