@@ -7,6 +7,7 @@ import userRouter from "./routes/user.routes";
 import addressRouter from "./routes/address.route";
 import productRouter from "./routes/product.route";
 import cartRouter from "./routes/cart.route";
+import orderRouter from "./routes/order.route";
 
 const server = express();
 server.use(express.json());
@@ -17,6 +18,7 @@ server.use("/user", userRouter);
 server.use("/address", addressRouter);
 server.use("/product", productRouter);
 server.use("/cart", cartRouter);
+server.use("/order", orderRouter);
 server.use(errorMiddleware);
 
 (async () => {

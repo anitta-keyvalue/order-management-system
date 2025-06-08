@@ -19,6 +19,10 @@ class ProductRepository {
       }
     });
   }
+
+  async save(product: Product): Promise<Product> {
+    return this.repository.save(product);
+  }
 }
 
 export default ProductRepository;

@@ -5,7 +5,7 @@ import Order from "./order.entity";
 
 @Entity()
 class OrderItem extends AbstractEntity {
-  @OneToOne(() => Order, (order) => order.id)
+  @ManyToOne(() => Order, (order) => order.id)
   @JoinColumn({ name: "order_id" })
   @Column()
   orderId: number;
