@@ -16,9 +16,14 @@ class OrderRepository {
   }
 
   async findByUserId(userId: number): Promise<Order[]> {
-    return this.repository.find({ 
+    return this.repository.find({
       where: { userId },
-      relations: ["items"]
+      relations: {
+        items: true
+      },
+      order: {
+        createdAt: "DESC"
+      }
     });
   }
 

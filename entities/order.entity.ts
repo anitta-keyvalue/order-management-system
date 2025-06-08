@@ -7,12 +7,12 @@ import Address from "./address.entity";
 
 @Entity()
 class Order extends AbstractEntity {
-  @OneToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: "user_id" })
   @Column()
   userId: number;
 
-  @OneToOne(() => Address, (address) => address.id)
+  @ManyToOne(() => Address, (address) => address.id)
   @JoinColumn({ name: "order_address_id" })
   @Column()
   orderAddressId: number;

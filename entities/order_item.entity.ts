@@ -10,9 +10,11 @@ class OrderItem extends AbstractEntity {
   @Column()
   orderId: number;
 
-  @Column()
-  @OneToOne(() => Product, (product) => product.id)
+  @ManyToOne(() => Product)
   @JoinColumn({ name: "product_id" })
+  product: Product;
+
+  @Column()
   productId: number;
 
   @Column()

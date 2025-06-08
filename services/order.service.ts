@@ -1,10 +1,11 @@
 import { CreateOrderItemDto } from "../dto/create-order.dto";
 import Order from "../entities/order.entity";
 import OrderRepository from "../repositories/order.repository";
-import AddressService from "./address.service";
 import ProductRepository from "../repositories/product.repository";
 import HttpException from "../exceptions/httpException";
 import OrderItem from "../entities/order_item.entity";
+import Product from "../entities/product.entity";
+import { dataSource } from "../db/data-source";
 
 class OrderService {
   constructor(
@@ -21,27 +22,50 @@ class OrderService {
     let totalPrice = 0;
     const orderItems: OrderItem[] = [];
     order.userId = userId;
-    for (const item of items) {
-      const product = await this.productRepository.findOneById(item.productId);
-      if (!product) {
-        throw new HttpException(404, "Product not found");
+
+    // Start transaction
+    const queryRunner = dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      for (const item of items) {
+        const product = await queryRunner.manager.findOne(Product, {
+          where: { id: item.productId }
+        });
+        
+        if (!product) {
+          throw new HttpException(404, "Product not found");
+        }
+        
+        if (product.stock < item.quantity) {
+          throw new HttpException(400, "Product quantity is not enough");
+        }
+
+        product.stock -= item.quantity;
+        await queryRunner.manager.save(product);
+
+        const orderItem = new OrderItem();
+        orderItem.productId = product.id;
+        orderItem.quantity = item.quantity;
+        orderItem.price = product.price;
+        orderItems.push(orderItem);
+        totalPrice += product.price * item.quantity;
       }
-      if (product.stock < item.quantity) {
-        throw new HttpException(400, "Product quantity is not enough");
-      }
-      product.stock -= item.quantity;
-      await this.productRepository.save(product);
-      const orderItem = new OrderItem();
-      orderItem.productId = product.id;
-      orderItem.quantity = item.quantity;
-      orderItem.price = product.price;
-      orderItems.push(orderItem);
-      totalPrice += product.price * item.quantity;
+
+      order.orderAddressId = addressId;
+      order.items = orderItems;
+      order.status = "SUCCESS"; 
+      order.totalPrice = totalPrice;
+
+      await queryRunner.manager.save(order);
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
     }
-    order.orderAddressId = addressId;
-    order.items = orderItems;
-    order.status = "SUCCESS";
-    order.totalPrice = totalPrice;
     return this.orderRepository.create(order);
   }
 
