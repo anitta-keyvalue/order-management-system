@@ -6,12 +6,18 @@ import HttpException from "../exceptions/httpException";
 import OrderItem from "../entities/order_item.entity";
 import Product from "../entities/product.entity";
 import { dataSource } from "../db/data-source";
+import QueueService, { QueueMessage } from "./queue.service";
+import { v4 as uuidv4 } from 'uuid';
 
 class OrderService {
+  private queueService: QueueService;
+
   constructor(
     private orderRepository: OrderRepository,
     private productRepository: ProductRepository
-  ) {}
+  ) {
+    this.queueService = new QueueService();
+  }
 
   async createOrder(
     userId: number,
@@ -60,13 +66,16 @@ class OrderService {
 
       await queryRunner.manager.save(order);
       await queryRunner.commitTransaction();
+
+      // Publish order created message to queue
+      await this.publishOrderCreatedEvent(order);
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;
     } finally {
       await queryRunner.release();
     }
-    return this.orderRepository.create(order);
+    return order;
   }
 
   async findByUserId(userId: number): Promise<Order[]> {
@@ -97,6 +106,27 @@ class OrderService {
       throw new HttpException(404, "Order not found");
     }
     await this.orderRepository.delete(order.id);
+  }
+
+  private async publishOrderCreatedEvent(order: Order): Promise<void> {
+    try {
+      const message: QueueMessage = {
+        id: uuidv4(),
+        type: 'ORDER_CREATED',
+        data: {
+          orderId: order.id,
+          userId: order.userId,
+          orderDetails: order
+        },
+        timestamp: Date.now()
+      };
+
+      await this.queueService.publishMessage('order-events', message);
+      console.log(`Order created event published for order ${order.id}`);
+    } catch (error) {
+      console.error(`Failed to publish order created event for order ${order.id}:`, error);
+      // Don't throw error here to avoid breaking the order creation process
+    }
   }
 }
 

@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import AbstractEntity from "./abstract.entity";
 import User from "./user.entity";
 
@@ -11,6 +11,7 @@ class  Address extends AbstractEntity {
   pincode: string;
 
   @ManyToOne(() => User, (user) => user.addresses)
+  @JoinColumn({ name: "userId" })
   userId: number;
 
 

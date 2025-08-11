@@ -17,7 +17,6 @@ class User extends AbstractEntity {
   phone: string;
 
   @OneToMany(() => Address, (address) => address.userId)
-  @JoinColumn({ name: "addresses" })
   addresses: Address[];
 }
 
