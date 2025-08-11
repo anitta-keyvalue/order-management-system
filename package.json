@@ -9,6 +9,8 @@
     "start": "node app.js",
     "build": "rm -rf dist && npx tsc",
     "start-server": "npx tsc && node dist/app.js",
+    "start-consumer": "npx tsc && node dist/invoice-consumer.js",
+    "dev-consumer": "npx tsc --watch & node dist/invoice-consumer.js",
     "migration:create": "npm run build && npx typeorm migration:create",
     "migration:generate": "npm run build && npx typeorm migration:generate -d dist/db/data-source.js",
     "migration:run": "npm run build && npx typeorm migration:run -d dist/db/data-source.js",
@@ -25,15 +27,21 @@
   },
   "homepage": "https://github.com/anitta-keyvalue/order-management-system#readme",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.864.0",
+    "@types/pdfkit": "^0.17.2",
+    "@types/uuid": "^10.0.0",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
+    "pdfkit": "^0.17.1",
     "pg": "^8.16.0",
+    "redis": "^4.7.1",
     "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.24",
-    "typeorm-naming-strategies": "^4.1.0"
+    "typeorm-naming-strategies": "^4.1.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@testcontainers/postgresql": "^10.27.0",
